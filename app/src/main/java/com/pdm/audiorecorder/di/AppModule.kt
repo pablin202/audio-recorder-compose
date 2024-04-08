@@ -3,9 +3,11 @@ package com.pdm.audiorecorder.di
 import android.content.Context
 import com.pdm.audiorecorder.data.AndroidAudioPlayer
 import com.pdm.audiorecorder.data.AndroidRecorder
+import com.pdm.audiorecorder.data.AudioVisualizerImpl
 import com.pdm.audiorecorder.data.FileManagerImpl
 import com.pdm.audiorecorder.domain.AudioPlayer
 import com.pdm.audiorecorder.domain.AudioRecorder
+import com.pdm.audiorecorder.domain.AudioVisualizer
 import com.pdm.audiorecorder.domain.FileManager
 import dagger.Module
 import dagger.Provides
@@ -40,5 +42,12 @@ object AppModule {
         @ApplicationContext appContext: Context
     ): FileManager {
         return FileManagerImpl(appContext)
+    }
+
+    @Singleton
+    @Provides
+    fun provideVisualizer(
+    ): AudioVisualizer {
+        return AudioVisualizerImpl()
     }
 }

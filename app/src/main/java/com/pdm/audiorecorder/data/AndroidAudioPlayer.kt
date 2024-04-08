@@ -13,62 +13,24 @@ import javax.inject.Inject
 
 class AndroidAudioPlayer @Inject constructor(
     private val context: Context
-): AudioPlayer {
+) : AudioPlayer {
 
     private var player: MediaPlayer? = null
 
-//    override fun playFile(file: File) {
-//        MediaPlayer.create(context, file.toUri()).apply {
-//            player = this
-//            start()
-//        }
-//    }
-
-    override fun playFile(file: File): Flow<ByteArray> = callbackFlow {
+    override fun playFile(file: File) {
         player = MediaPlayer().apply {
             setDataSource(context, file.toUri())
             setOnPreparedListener {
                 start()
             }
-            prepareAsync()
-        }
-
-        val visualizer = Visualizer(player!!.audioSessionId)
-        visualizer.captureSize = Visualizer.getCaptureSizeRange()[1]
-        visualizer.setDataCaptureListener(object : Visualizer.OnDataCaptureListener {
-            override fun onWaveFormDataCapture(
-                visualizer: Visualizer?,
-                waveform: ByteArray?,
-                samplingRate: Int
-            ) {
-                waveform?.let {
-                    trySend(it).isSuccess
-                }
-            }
-
-            override fun onFftDataCapture(
-                visualizer: Visualizer?,
-                fft: ByteArray?,
-                samplingRate: Int
-            ) {
-                // No necesitamos manejar FFT en este caso
-            }
-        }, Visualizer.getMaxCaptureRate() / 2, true, false)
-
-
-        awaitClose {
-            player?.stop()
-            player?.release()
-            player = null
-            visualizer.enabled = false
-            visualizer.release()
         }
     }
-
 
     override fun stop() {
         player?.stop()
         player?.release()
         player = null
     }
+
+    override fun getAudioSessionId(): Int? = player?.audioSessionId
 }

@@ -26,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -99,7 +101,10 @@ fun AnimatedCircleToRoundedRectangle() {
 }
 
 @Composable
-fun AnimatedCircleToRoundedRectangleWithPadding() {
+fun AnimatedCircleToRoundedRectangleWithPadding(
+    size: Dp,
+    onClick: (startRecording: Boolean) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
 
@@ -112,16 +117,16 @@ fun AnimatedCircleToRoundedRectangleWithPadding() {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(100.dp) // Tamaño fijo del Box
+            .size(size)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     coroutineScope.launch {
                         if (cornerSizePx.value == initialCornerSizePx) {
-                            // Anima hacia rectángulo con bordes redondeados y mayor padding
+                            onClick(true)
                             launch { paddingPx.animateTo(targetValue = with(density) { 15.dp.toPx() }) }
                             launch { cornerSizePx.animateTo(targetValue = with(density) { 10.dp.toPx() }) }
                         } else {
-                            // Anima de vuelta hacia círculo con padding original
+                            onClick(false)
                             launch { paddingPx.animateTo(targetValue = initialPaddingPx) }
                             launch { cornerSizePx.animateTo(targetValue = initialCornerSizePx) }
                         }

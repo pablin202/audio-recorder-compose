@@ -1,7 +1,6 @@
 package com.pdm.audiorecorder.presentation.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -11,15 +10,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
-fun AudioVisualizer(flow: Flow<ByteArray>) {
+fun AudioVisualizer(flow: MutableSharedFlow<ByteArray?>) {
     val waveform = remember { mutableStateOf(byteArrayOf()) }
 
     LaunchedEffect(flow) {
         flow.collect { bytes ->
-            waveform.value = bytes
+            if (bytes != null) {
+                waveform.value = bytes
+            }
         }
     }
 
@@ -36,6 +37,6 @@ fun AudioVisualizer(flow: Flow<ByteArray>) {
                 path.lineTo(x, y)
             }
         }
-        drawPath(path, color = Color.White)
+        drawPath(path, color = Color.Red)
     }
 }

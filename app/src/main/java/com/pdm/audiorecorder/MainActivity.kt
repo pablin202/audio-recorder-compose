@@ -53,13 +53,11 @@ class MainActivity : ComponentActivity() {
 
                     Column {
                         if (isPermissionGranted) {
-                            AnimatedCircleToRoundedRectangleWithPadding()
-                            //HomeScreen()
+                            HomeScreen()
                         } else {
-                            AnimatedCircleToRoundedRectangleWithPadding()
-//                            Button(onClick = { requestPermission() }) {
-//                                Text("Request Permission")
-//                            }
+                            Button(onClick = { requestPermission() }) {
+                                Text("Request Permission")
+                            }
                         }
                     }
                 }

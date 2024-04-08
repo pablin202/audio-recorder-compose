@@ -12,10 +12,7 @@ class FileManagerImpl @Inject constructor(private val context: Context) : FileMa
     override fun createNewAudioFile(): String {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "recording_$timeStamp.mp3"
-        val filePath = context.filesDir.absolutePath + File.separator + fileName
-        val file = File(filePath)
-        file.createNewFile()
-        return filePath
+        return context.filesDir.absolutePath + File.separator + fileName
     }
 
     override fun listAudioFiles(): List<String> {
@@ -28,9 +25,14 @@ class FileManagerImpl @Inject constructor(private val context: Context) : FileMa
         return fileList.sorted()
     }
 
+
     override fun renameAudioFile(oldName: String, newName: String): Boolean {
         val oldFile = File(context.filesDir, oldName)
         val newFile = File(context.filesDir, newName)
         return oldFile.renameTo(newFile)
+    }
+
+    override fun getFile(name: String): File {
+        return File(context.filesDir.absolutePath + File.separator + name)
     }
 }
