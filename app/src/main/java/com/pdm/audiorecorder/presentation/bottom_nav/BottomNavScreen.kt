@@ -54,7 +54,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         contentDescription = item.title
                     )
                 },
-                label = { Text(item.title) },
+                //label = { Text(item.title) },
                 selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
