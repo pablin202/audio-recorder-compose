@@ -1,4 +1,4 @@
-package com.pdm.audiorecorder.presentation
+package com.pdm.audiorecorder.presentation.home
 
 sealed class UIState {
     data object Loading : UIState()
@@ -10,6 +10,7 @@ sealed class UIState {
     data object AudioRecordingStopped : UIState()
     data class AudioPlaybackStarted(val filePath: String) : UIState()
     data object AudioPlaybackStopped : UIState()
+    data object AudioPlaybackPaused : UIState()
     data object StopAudioRecording : UIState()
     data object StopAudioPlayback : UIState()
     data class Error(val message: String) : UIState()

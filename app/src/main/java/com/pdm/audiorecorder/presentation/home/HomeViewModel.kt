@@ -1,15 +1,13 @@
-package com.pdm.audiorecorder.presentation
+package com.pdm.audiorecorder.presentation.home
 
-import android.media.audiofx.Visualizer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pdm.audiorecorder.domain.AudioPlayer
 import com.pdm.audiorecorder.domain.AudioRecorder
 import com.pdm.audiorecorder.domain.AudioVisualizer
 import com.pdm.audiorecorder.domain.FileManager
+import com.pdm.audiorecorder.domain.models.AudioFile
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -27,25 +25,35 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UIState>(UIState.Loading)
     val uiState: StateFlow<UIState> = _uiState
 
-    private val _recordings = MutableStateFlow<List<String>>(emptyList())
-    val recordings: StateFlow<List<String>> = _recordings
 
     private val _visualizerData = MutableStateFlow<ByteArray?>(null)
     val visualizerData: StateFlow<ByteArray?> = _visualizerData
 
-    init {
-        listAudioFiles()
-    }
+    private val _isRecording = MutableStateFlow(false)
+    val isRecording: StateFlow<Boolean> = _isRecording
+
+    private val _amplitudes = MutableStateFlow<List<Int>>(emptyList())
+    val amplitudes: StateFlow<List<Int>> = _amplitudes
 
     fun startAudioRecording() {
         val outputFile = createNewAudioFile()
-        audioRecorder.start(outputFile)
+        _isRecording.value = true
+        viewModelScope.launch {
+            audioRecorder.start(outputFile).collect {maxAmplitude ->
+                val newList = _amplitudes.value.toMutableList()
+                if (newList.size >= MAX_AMPLITUDES) {
+                    newList.removeFirst()
+                }
+                newList.add(maxAmplitude)
+                _amplitudes.value = newList
+            }
+        }
     }
 
     fun stopAudioRecording() {
         audioRecorder.stop()
+        _isRecording.value = false
         _uiState.value = UIState.AudioRecordingStopped
-        listAudioFiles()
     }
 
     fun playAudio(fileName: String) {
@@ -63,14 +71,13 @@ class HomeViewModel @Inject constructor(
         _uiState.value = UIState.AudioPlaybackStopped
     }
 
-    private fun createNewAudioFile(): File {
-        return File(fileManager.createNewAudioFile())
+    fun pauseAudioPlayback() {
+        audioPlayer.pause()
+        _uiState.value = UIState.AudioPlaybackPaused
     }
 
-    private fun listAudioFiles() {
-        viewModelScope.launch {
-            _recordings.value = fileManager.listAudioFiles()
-        }
+    private fun createNewAudioFile(): File {
+        return File(fileManager.createNewAudioFile())
     }
 
     fun renameAudioFile(oldName: String, newName: String) {
@@ -80,5 +87,9 @@ class HomeViewModel @Inject constructor(
         } else {
             _uiState.value = UIState.Error("Failed to rename file")
         }
+    }
+
+    companion object {
+        private const val MAX_AMPLITUDES = 50 // Ajusta este valor según sea necesario
     }
 }

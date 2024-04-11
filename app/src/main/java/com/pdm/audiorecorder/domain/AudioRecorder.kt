@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface AudioRecorder {
-    fun start(outputFile: File)
+    fun start(outputFile: File): Flow<Int>
     fun stop()
 }

@@ -11,19 +11,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
-import com.pdm.audiorecorder.presentation.HomeScreen
-import com.pdm.audiorecorder.presentation.HomeViewModel
-import com.pdm.audiorecorder.presentation.components.AnimatedCircleToRoundedRectangle
-import com.pdm.audiorecorder.presentation.components.AnimatedCircleToRoundedRectangleWithPadding
-import com.pdm.audiorecorder.presentation.components.AnimatedShapeToggle
+import com.pdm.audiorecorder.presentation.bottom_nav.BottomNavScreen
+import com.pdm.audiorecorder.presentation.home.HomeScreen
 import com.pdm.audiorecorder.ui.theme.AudioRecorderTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,24 +38,23 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AudioRecorderTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val context = LocalContext.current
-                    val isPermissionGranted by remember { mutableStateOf(checkPermission()) }
+                val isPermissionGranted by remember { mutableStateOf(checkPermission()) }
 
-                    Column {
-                        if (isPermissionGranted) {
-                            HomeScreen()
-                        } else {
+                if (isPermissionGranted) {
+                    BottomNavScreen()
+                } else {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        Column {
                             Button(onClick = { requestPermission() }) {
                                 Text("Request Permission")
                             }
                         }
                     }
                 }
+
             }
         }
     }

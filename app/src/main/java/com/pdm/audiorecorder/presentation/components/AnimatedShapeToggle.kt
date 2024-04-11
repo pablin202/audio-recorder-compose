@@ -143,6 +143,7 @@ fun AnimatedCircleToRoundedRectangleWithPadding(
     }
 }
 
+
 @Preview
 @Composable
 fun AnimatedShapeTogglePreview() {

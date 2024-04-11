@@ -18,52 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 class AndroidRecorder @Inject constructor(private val context: Context) : AudioRecorder {
-//
-//    private var audioRecord: AudioRecord? = null
-//    private var visualizer: Visualizer? = null
-//    private var recordingFilePath: String? = null
-//
-//    @SuppressLint("MissingPermission")
-//    override fun start(outputFile: File): Visualizer? {
-//        recordingFilePath = outputFile.absolutePath
-//
-//        val sampleRate = 44100 // Hz
-//        val channelConfig = android.media.AudioFormat.CHANNEL_IN_MONO
-//        val audioFormat = android.media.AudioFormat.ENCODING_PCM_16BIT
-//        val minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
-//
-//        audioRecord = AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufferSize)
-//
-//        audioRecord?.startRecording()
-//
-////        audioRecord?.audioSessionId?.let { sessionId ->
-////            visualizer = Visualizer(sessionId).apply {
-////                captureSize = Visualizer.getCaptureSizeRange()[1]
-////                setDataCaptureListener(object : Visualizer.OnDataCaptureListener {
-////                    override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) {
-////                        // Aquí se manejarían los datos de la forma de onda para la visualización.
-////                    }
-////
-////                    override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
-////                        // FFT data no es necesario en este caso.
-////                    }
-////                }, Visualizer.getMaxCaptureRate() / 2, true, false)
-////                enabled = true
-////            }
-////        }
-//
-//        return visualizer
-//    }
-//
-//    override fun stop() {
-//        audioRecord?.stop()
-//        audioRecord?.release()
-//        audioRecord = null
-//
-//        visualizer?.enabled = false
-//        visualizer?.release()
-//        visualizer = null
-//    }
 
     private var recorder: MediaRecorder? = null
 
@@ -73,7 +27,7 @@ class AndroidRecorder @Inject constructor(private val context: Context) : AudioR
         } else MediaRecorder()
     }
 
-    override fun start(outputFile: File) {
+    override fun start(outputFile: File): Flow<Int> {
         createRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -85,11 +39,37 @@ class AndroidRecorder @Inject constructor(private val context: Context) : AudioR
 
             recorder = this
         }
+
+        return callbackFlow {
+            val amplitudeChecker = object : Runnable {
+                override fun run() {
+                    recorder?.let {
+                        try {
+                            val maxAmplitude = it.maxAmplitude
+                            trySend(maxAmplitude)
+                        } catch (e: Exception) {
+                            // Manejar excepción si es necesario
+                        }
+                    }
+                    handler.postDelayed(this, 100)
+                }
+            }
+
+            handler.post(amplitudeChecker)
+
+            awaitClose {
+                handler.removeCallbacks(amplitudeChecker)
+            }
+        }
     }
 
     override fun stop() {
         recorder?.stop()
         recorder?.reset()
         recorder = null
+    }
+
+    companion object {
+        private val handler = android.os.Handler(android.os.Looper.getMainLooper())
     }
 }

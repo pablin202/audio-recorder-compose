@@ -32,5 +32,9 @@ class AndroidAudioPlayer @Inject constructor(
         player = null
     }
 
+    override fun pause() {
+        player?.pause()
+    }
+
     override fun getAudioSessionId(): Int? = player?.audioSessionId
 }
