@@ -2,11 +2,9 @@ package com.pdm.audiorecorder.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pdm.audiorecorder.domain.AudioPlayer
 import com.pdm.audiorecorder.domain.AudioRecorder
-import com.pdm.audiorecorder.domain.AudioVisualizer
 import com.pdm.audiorecorder.domain.FileManager
-import com.pdm.audiorecorder.domain.models.AudioFile
+import com.pdm.audiorecorder.domain.repositories.AudioRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,14 +15,12 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val audioRecorder: AudioRecorder,
-    private val audioPlayer: AudioPlayer,
-    private val audioVisualizer: AudioVisualizer,
-    private val fileManager: FileManager
+    private val fileManager: FileManager,
+    private val audioRepository: AudioRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UIState>(UIState.Loading)
     val uiState: StateFlow<UIState> = _uiState
-
 
     private val _visualizerData = MutableStateFlow<ByteArray?>(null)
     val visualizerData: StateFlow<ByteArray?> = _visualizerData
@@ -39,7 +35,7 @@ class HomeViewModel @Inject constructor(
         val outputFile = createNewAudioFile()
         _isRecording.value = true
         viewModelScope.launch {
-            audioRecorder.start(outputFile).collect {maxAmplitude ->
+            audioRecorder.start(outputFile).collect { maxAmplitude ->
                 val newList = _amplitudes.value.toMutableList()
                 if (newList.size >= MAX_AMPLITUDES) {
                     newList.removeFirst()
@@ -51,42 +47,19 @@ class HomeViewModel @Inject constructor(
     }
 
     fun stopAudioRecording() {
-        audioRecorder.stop()
+        audioRecorder.stop {
+            fileManager.getAudioFile(it)?.let {
+                viewModelScope.launch {
+                    audioRepository.addAudio(it)
+                }
+            }
+        }
         _isRecording.value = false
         _uiState.value = UIState.AudioRecordingStopped
     }
 
-    fun playAudio(fileName: String) {
-        audioPlayer.playFile(fileManager.getFile(fileName)).also {
-            audioPlayer.getAudioSessionId()?.let {
-                audioVisualizer.attachSession(it) { waveform ->
-                    _visualizerData.value = waveform
-                }
-            }
-        }
-    }
-
-    fun stopAudioPlayback() {
-        audioPlayer.stop()
-        _uiState.value = UIState.AudioPlaybackStopped
-    }
-
-    fun pauseAudioPlayback() {
-        audioPlayer.pause()
-        _uiState.value = UIState.AudioPlaybackPaused
-    }
-
     private fun createNewAudioFile(): File {
         return File(fileManager.createNewAudioFile())
-    }
-
-    fun renameAudioFile(oldName: String, newName: String) {
-        val success = fileManager.renameAudioFile(oldName, newName)
-        if (success) {
-            _uiState.value = UIState.AudioFileRenamed(oldName, newName)
-        } else {
-            _uiState.value = UIState.Error("Failed to rename file")
-        }
     }
 
     companion object {

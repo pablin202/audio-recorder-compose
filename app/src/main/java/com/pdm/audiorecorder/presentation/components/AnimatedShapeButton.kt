@@ -1,5 +1,6 @@
 package com.pdm.audiorecorder.presentation.components
 
+import android.provider.CalendarContract.Colors
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import com.pdm.audiorecorder.ui.theme.Red
 
 @Composable
 fun AnimatedShapeButton(
@@ -51,7 +53,7 @@ fun AnimatedShapeButton(
             modifier = Modifier
                 .size(internalSize.value)
                 .clip(RoundedCornerShape(cornerRadius.value))
-                .background(Color.Red)
+                .background(Red)
         )
     }
 }

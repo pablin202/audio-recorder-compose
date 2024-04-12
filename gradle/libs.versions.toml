@@ -12,6 +12,8 @@ hilt = "2.50"
 kps = "1.9.22-1.0.17"
 navigationCompose = "2.7.7"
 hiltNavigationCompose = "1.2.0"
+room = "2.6.1"
+testRunner = "1.5.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -19,6 +21,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler= { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-test = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -32,6 +35,13 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+mockito-core = "org.mockito:mockito-core:5.11.0"
+mockito-inline = "org.mockito:mockito-inline:5.2.1"
+mockito-kotlin = "org.mockito.kotlin:mockito-kotlin:5.2.1"
+mockito-android = "org.mockito:mockito-android:5.11.0"
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

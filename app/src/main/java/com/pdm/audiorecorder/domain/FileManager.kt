@@ -8,4 +8,5 @@ interface FileManager {
     fun renameAudioFile(oldName: String, newName: String): Boolean
     fun getFile(name: String): File
     fun listAudioFiles(): List<AudioFile>
+    fun getAudioFile(file: File): AudioFile?
 }

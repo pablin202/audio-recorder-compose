@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pdm.audiorecorder.R
+import com.pdm.audiorecorder.presentation.favourites.FavouritesScreen
 import com.pdm.audiorecorder.presentation.home.HomeScreen
 import com.pdm.audiorecorder.presentation.list.ListScreen
 
@@ -30,6 +31,7 @@ fun BottomNavScreen() {
         NavHost(navController, startDestination = "home", Modifier.padding(innerPadding)) {
             composable("home") { HomeScreen() }
             composable("list") { ListScreen() }
+            composable("favorites") { FavouritesScreen() }
         }
     }
 }
@@ -38,7 +40,8 @@ fun BottomNavScreen() {
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.List
+        BottomNavItem.List,
+        BottomNavItem.Favourites
     )
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
@@ -54,7 +57,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         contentDescription = item.title
                     )
                 },
-                //label = { Text(item.title) },
+                label = { Text(item.title) },
                 selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
@@ -74,5 +77,6 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 enum class BottomNavItem(val route: String, val icon: Int, val title: String) {
     Home("home", R.drawable.record_voice_over, "Home"),
-    List("list", R.drawable.format_list_bulleted, "Records")
+    List("list", R.drawable.format_list_bulleted, "Records"),
+    Favourites("favorites", R.drawable.favorite_icon, "Favorites")
 }

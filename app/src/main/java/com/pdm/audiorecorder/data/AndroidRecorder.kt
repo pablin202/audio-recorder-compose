@@ -1,18 +1,12 @@
 package com.pdm.audiorecorder.data
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
-import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Build
 import com.pdm.audiorecorder.domain.AudioRecorder
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
-import android.media.audiofx.Visualizer
-import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -20,9 +14,10 @@ import kotlinx.coroutines.flow.callbackFlow
 class AndroidRecorder @Inject constructor(private val context: Context) : AudioRecorder {
 
     private var recorder: MediaRecorder? = null
+    private var currentFilePath: File? = null
 
     private fun createRecorder(): MediaRecorder {
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MediaRecorder(context)
         } else MediaRecorder()
     }
@@ -36,7 +31,7 @@ class AndroidRecorder @Inject constructor(private val context: Context) : AudioR
 
             prepare()
             start()
-
+            currentFilePath = outputFile
             recorder = this
         }
 
@@ -48,7 +43,7 @@ class AndroidRecorder @Inject constructor(private val context: Context) : AudioR
                             val maxAmplitude = it.maxAmplitude
                             trySend(maxAmplitude)
                         } catch (e: Exception) {
-                            // Manejar excepción si es necesario
+                            e.printStackTrace()
                         }
                     }
                     handler.postDelayed(this, 100)
@@ -63,10 +58,14 @@ class AndroidRecorder @Inject constructor(private val context: Context) : AudioR
         }
     }
 
-    override fun stop() {
+    override fun stop(onNewRecord: (file: File) -> Unit) {
         recorder?.stop()
         recorder?.reset()
         recorder = null
+        currentFilePath?.let {
+            onNewRecord(it)
+        }
+        currentFilePath = null
     }
 
     companion object {

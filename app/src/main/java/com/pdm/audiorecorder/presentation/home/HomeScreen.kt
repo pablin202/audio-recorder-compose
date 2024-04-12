@@ -23,37 +23,30 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pdm.audiorecorder.domain.models.AudioFile
 import com.pdm.audiorecorder.presentation.components.AnimatedShapeButton
+import com.pdm.audiorecorder.ui.theme.Red
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
     val waveform = viewModel.visualizerData.collectAsState(initial = null).value
     val isRecording by viewModel.isRecording.collectAsState()
     val amplitudes by viewModel.amplitudes.collectAsState()
 
     HomeContent(
-        waveform = waveform,
         isRecording = isRecording,
         amplitudes = amplitudes,
         startRecording = { viewModel.startAudioRecording() },
-        stopRecording = { viewModel.stopAudioRecording() },
-        startReproduction = { /*TODO*/ }) {
-    }
-
+        stopRecording = { viewModel.stopAudioRecording() })
 }
 
 @Composable
 fun HomeContent(
-    waveform: ByteArray?,
     isRecording: Boolean,
     amplitudes: List<Int>,
     startRecording: () -> Unit,
     stopRecording: () -> Unit,
-    startReproduction: () -> Unit,
-    pauseReproduction: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -113,15 +106,17 @@ private fun DrawScope.drawAmplitudeBar(
     val normalizedAmplitude = amplitude.toFloat() / maxAmplitude
     val barHeight = size.height * 0.5f * normalizedAmplitude
     val totalWidth = size.width
-    val barWidth = totalWidth / totalBars // Ajustamos el ancho de la barra para que todas las barras quepan en el ancho total
-    val effectiveBarWidth = barWidth * 0.8f // Usamos el 80% del ancho de la barra para la barra en sí y el 20% para el espaciado
+    val barWidth =
+        totalWidth / totalBars // Ajustamos el ancho de la barra para que todas las barras quepan en el ancho total
+    val effectiveBarWidth =
+        barWidth * 0.8f // Usamos el 80% del ancho de la barra para la barra en sí y el 20% para el espaciado
     val spacing = barWidth * 0.2f // Calculamos el espaciado como el 20% del ancho de la barra
     val barTop = (size.height / 2) - (barHeight / 2)
 
     val barStartX = totalWidth - effectiveBarWidth - (index * barWidth) - (spacing * index)
 
     drawRoundRect(
-        color = Color.Red,
+        color = Red,
         topLeft = Offset(x = barStartX, y = barTop),
         size = Size(width = effectiveBarWidth, height = barHeight),
         cornerRadius = CornerRadius(x = effectiveBarWidth / 2, y = effectiveBarWidth / 2)

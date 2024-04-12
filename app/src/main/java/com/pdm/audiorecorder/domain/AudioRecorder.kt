@@ -6,5 +6,5 @@ import java.io.File
 
 interface AudioRecorder {
     fun start(outputFile: File): Flow<Int>
-    fun stop()
+    fun stop(onNewRecord: (file: File) -> Unit)
 }

@@ -1,13 +1,11 @@
 package com.pdm.audiorecorder.data
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.audiofx.Visualizer
+import android.net.Uri
 import androidx.core.net.toUri
 import com.pdm.audiorecorder.domain.AudioPlayer
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
 import javax.inject.Inject
 
@@ -17,11 +15,31 @@ class AndroidAudioPlayer @Inject constructor(
 
     private var player: MediaPlayer? = null
 
-    override fun playFile(file: File) {
+    override fun playFile(file: File, onCompletion: () -> Unit) {
+        playAudio(file.toUri()) {
+            onCompletion()
+        }
+    }
+
+    override fun playFile(file: String, onCompletion: () -> Unit) {
+        playAudio(file.toUri()) {
+            onCompletion()
+        }
+    }
+
+    private fun playAudio(uri: Uri, onCompletion: () -> Unit) {
         player = MediaPlayer().apply {
-            setDataSource(context, file.toUri())
-            setOnPreparedListener {
-                start()
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            setDataSource(context, uri)
+            prepare()
+            start()
+            setOnCompletionListener {
+                onCompletion()
             }
         }
     }

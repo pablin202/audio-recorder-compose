@@ -30,11 +30,23 @@ class FileManagerImpl @Inject constructor(private val context: Context) : FileMa
             val duration = getDurationOfFile(file.path)
             val creationDate = Date(file.lastModified())
             if (duration > 0L) {
-                val audioFile = AudioFile(name, duration, file.path, creationDate)
+                val audioFile =
+                    AudioFile(0, name = name, duration, file.path, creationDate, creationDate)
                 audioList.add(audioFile)
             }
         }
         return audioList
+    }
+
+    override fun getAudioFile(file: File): AudioFile? {
+        val name = file.name
+        val duration = getDurationOfFile(file.path)
+        val creationDate = Date(file.lastModified())
+        return if (duration > 0L) {
+            AudioFile(0, name = name, duration, file.path, creationDate, creationDate)
+        } else {
+            null
+        }
     }
 
     override fun renameAudioFile(oldName: String, newName: String): Boolean {
