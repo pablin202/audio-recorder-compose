@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -14,11 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import com.pdm.audiorecorder.presentation.bottom_nav.BottomNavScreen
-import com.pdm.audiorecorder.presentation.home.HomeScreen
 import com.pdm.audiorecorder.ui.theme.AudioRecorderTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,14 +28,17 @@ class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                // Permiso concedido, puedes realizar la grabación de audio
+                checkPermission()
             } else {
-                // Permiso denegado, muestra un mensaje o toma alguna acción
+                // no-op
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
             AudioRecorderTheme {
                 val isPermissionGranted by remember { mutableStateOf(checkPermission()) }
@@ -47,14 +50,16 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        Column {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Button(onClick = { requestPermission() }) {
                                 Text("Request Permission")
                             }
                         }
                     }
                 }
-
             }
         }
     }

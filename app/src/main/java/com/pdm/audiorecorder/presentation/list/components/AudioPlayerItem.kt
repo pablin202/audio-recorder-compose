@@ -69,7 +69,9 @@ fun AudioPlayerItem(
                 modifier = Modifier.padding(top = 4.dp),
                 text = audioFile.name.removeSuffix(".mp3"),
                 color = Grey,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Medium
+                )
             )
             Text(
                 modifier = Modifier.padding(bottom = 4.dp),
@@ -93,7 +95,9 @@ fun AudioPlayerItem(
                     .clickable {
                         onFavoriteChanged(audioFile.id)
                     },
-                painter = if (audioFile.isFavorite) painterResource(id = R.drawable.favorite_filled_icon) else painterResource(
+                painter = if (audioFile.isFavorite)
+                    painterResource(id = R.drawable.favorite_filled_icon)
+                else painterResource(
                     id = R.drawable.favorite_icon
                 ),
                 contentDescription = "",

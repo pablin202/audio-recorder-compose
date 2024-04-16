@@ -7,5 +7,8 @@ interface AudioPlayer {
     fun playFile(file: String, onCompletion: () -> Unit)
     fun stop()
     fun pause()
+    fun resume()
+    fun seekTo(position: Int)
     fun getAudioSessionId(): Int?
+    fun getCurrentPosition(): Int
 }

@@ -15,6 +15,8 @@ class AndroidAudioPlayer @Inject constructor(
 
     private var player: MediaPlayer? = null
 
+    private var stoppedPosition: Int = 0
+
     override fun playFile(file: File, onCompletion: () -> Unit) {
         playAudio(file.toUri()) {
             onCompletion()
@@ -52,7 +54,19 @@ class AndroidAudioPlayer @Inject constructor(
 
     override fun pause() {
         player?.pause()
+        stoppedPosition = player?.currentPosition ?: 0
+    }
+
+    override fun resume() {
+        player?.seekTo(stoppedPosition)
+        player?.start()
+    }
+
+    override fun seekTo(position: Int) {
+        player?.seekTo(position)
     }
 
     override fun getAudioSessionId(): Int? = player?.audioSessionId
+
+    override fun getCurrentPosition(): Int = player?.currentPosition ?: 0
 }
